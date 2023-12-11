@@ -11,29 +11,23 @@ import sys
 # housing.csv - median_house_value
 # onlinefraud.csv - amount - za duża baza ???
 
+# Wgranie zestawu danych
 df = pd.read_csv('C:/Users/aga54/Desktop/Praca_inżynierska/housing.csv')
 data = df['median_house_value']
-# print(df['Volume'])   #lub print(df.iloc[:,5])
 
-# Wyliczenie wyników na podstawie rozkładu Benforda
+# Wyliczenie watości oczekiwanej
 total_rows = df.shape[0]    # zliczanie wierszy
 Benford = [30.1, 17.6, 12.5, 9.7, 7.9, 6.7, 5.8, 5.1, 4.6]
-
 def benford_results(rows):
     print("Wyniki wyliczone na podstawie rozkładu Benforda:")
     for index, p in enumerate(Benford):
         result = round(p * rows / 100)
         print("Cyfra", index + 1, "->", result)
-
     #Wykres rozkładu Benforda
-    # plt.plot(range(1, 10), [round(p * rows / 100) for p in Benford], label='Rozkład Benforda', color='orangered')
-    plt.plot(range(1, 10), [round(p * rows / 100) for p in Benford], label='Rozkład Benforda', color='#737373')
-
-    # results = [round(p * rows / 100) for p in Benford]
-    # print(results)
+    plt.plot(range(1, 10), [round(p * rows / 100) for p in Benford], label='Rozkład Benforda', color='orangered') # color='#737373'
 
 
-# Zliczanie ilości pierwszych cyfr
+# Wyliczenie watości mierzonej
 def first_digit(data):
     fd_data = data.astype(str).str[:1].astype(int)
     digit = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -42,13 +36,8 @@ def first_digit(data):
     for i in digit:
         count_digit = fd_data.value_counts()[i]
         print("Cyfra", i, "->", count_digit)
-
     # Wykres rozkładu pierwszych cyfr
-    # plt.bar(digit, [fd_data.value_counts()[i] for i in digit], label='Rozkład pierwszych cyfr')
-    plt.bar(digit, [fd_data.value_counts()[i] for i in digit], label='Rozkład pierwszych cyfr', color='#73b3bb')
-
-    # count = fd_data.value_counts(dropna=False)[3]
-    # print(count)
+    plt.bar(digit, [fd_data.value_counts()[i] for i in digit], label='Rozkład pierwszych cyfr') # , color='#73b3bb'
 
 
 # Wywołanie funkcji
