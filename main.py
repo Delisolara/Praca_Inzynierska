@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.stats import chi2
 import sys
 
 # Testv2.csv - Volume
@@ -11,41 +12,47 @@ import sys
 # housing.csv - median_house_value
 # onlinefraud.csv - amount - za duża baza ???
 
+
 # Wgranie zestawu danych
-df = pd.read_csv('C:/Users/aga54/Desktop/Praca_inżynierska/housing.csv')
-data = df['median_house_value']
+df = pd.read_csv('C:/Users/aga54/Desktop/Praca_inżynierska/avocado.csv')
+data = df['Total Volume']
+df.isnull().sum()
 
 # Wyliczenie watości oczekiwanej
 total_rows = df.shape[0]    # zliczanie wierszy
 Benford = [30.1, 17.6, 12.5, 9.7, 7.9, 6.7, 5.8, 5.1, 4.6]
-def benford_results(rows):
-    print("Wyniki wyliczone na podstawie rozkładu Benforda:")
-    for index, p in enumerate(Benford):
-        result = round(p * rows / 100)
-        print("Cyfra", index + 1, "->", result)
-    #Wykres rozkładu Benforda
-    plt.plot(range(1, 10), [round(p * rows / 100) for p in Benford], label='Rozkład Benforda', color='orangered') # color='#737373'
+
+expected_counts = np.array([round(p * total_rows / 100) for p in Benford])
+print("Warość oczekiwana:", expected_counts)
 
 
 # Wyliczenie watości mierzonej
-def first_digit(data):
-    fd_data = data.astype(str).str[:1].astype(int)
-    digit = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+fd_data = data.astype(str).str[:1].astype(int)
+digit = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-    print("Wynik wyliczony z wgranej bazy:")
-    for i in digit:
-        count_digit = fd_data.value_counts()[i]
-        print("Cyfra", i, "->", count_digit)
-    # Wykres rozkładu pierwszych cyfr
-    plt.bar(digit, [fd_data.value_counts()[i] for i in digit], label='Rozkład pierwszych cyfr') # , color='#73b3bb'
+observed_counts = np.array([fd_data.value_counts()[i] for i in digit])
+print("Warość mierzona:", observed_counts)
 
 
-# Wywołanie funkcji
-df.isnull().sum()
-benford_results(total_rows)
+# Obliczenia dla testu Chi-kwadrat
+chi2_stat = np.sum((observed_counts - expected_counts)**2 / expected_counts)
+
+# Stopnie swobody to liczba kategorii minus 1
+degrees_of_freedom = len(digit) - 1
+
+# Wartość p (przy użyciu rozkładu chi-kwadrat)
+p_value = 1 - chi2.cdf(chi2_stat, degrees_of_freedom)
+
+# Wyświetlenie wyników testu Chi-kwadrat
 print()
-first_digit(data)
+print("Wyniki testu Chi-kwadrat:")
+print("Wartość statystyki Chi-kwadrat:", chi2_stat)
+print("Wartość p:", p_value)
 
+
+# Rysowanie wykresu
+plt.bar(digit, observed_counts, label='Rozkład pierwszych cyfr')    # , color='#73b3bb'
+plt.plot(digit, expected_counts, label='Rozkład Benforda', color='orangered')   # color='#737373'
 plt.xlabel('Cyfra')
 plt.ylabel('Liczba wystąpień')
 plt.title('Porównanie Rozkładu Benforda z danymi rzeczywistymi')
