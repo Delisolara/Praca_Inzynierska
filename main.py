@@ -34,7 +34,7 @@ def benford_distribution(total_rows,benford_type):
     print("Wartość empiryczna:", observed_counts, "\n")
 
     # Rozkład empiryczny
-    measured_distribution = (observed_counts / total_rows)  # * 100
+    measured_distribution = (observed_counts / total_rows)
 
     # Wartość statystyki Chi-kwadrat
     chi2_stat = (np.sum(((measured_distribution - benford)**2 / benford))) * total_rows
